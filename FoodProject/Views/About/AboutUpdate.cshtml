@@ -1,0 +1,42 @@
+﻿@model ProductProject.Data.Models.About
+@{
+    ViewData["Title"] = "AboutUpdate";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>About Update Page</h1>
+<br />
+@*@using (Html.BeginForm("AboutUpdate", "About", FormMethod.Post))*@
+<form class="form-group" action="AboutUpdate" asp-controller="About" method="post" enctype="multipart/form-data">
+
+    @Html.HiddenFor(x=>x.AboutID,new{@class="form-control"})
+    <br />
+    @Html.Label("About Title")
+    @Html.TextBoxFor(x=>x.AboutTitle,new{@class="form-control"})
+    <br />
+    @Html.Label("About Text")
+    @Html.TextAreaFor(x=>x.AboutText, 15, 3,new{@class="form-control"})
+    <br />
+    @Html.Label("Image URL")
+    @*@Html.TextBoxFor(x=>x.AboutImageURL,new{@class="form-control"})*@
+    <input type="file" name="AboutImageURL" required/>
+    <br />
+    <button id="btnUpdate" class="btn btn-warning">Update</button><br /><br />
+
+</form>
+
+<script>
+    $(function () {
+        $("#btnUpdate").click(function () {
+            //swal({
+            //    title: "Harika!",
+            //    text: "Başarıyla güncellendi.",
+            //    icon: "success",
+            //    button: "Tamam",
+            //});
+            alert("Başarıyla Güncellendi.");
+        });
+    });
+</script>
+
+

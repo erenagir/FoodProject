@@ -1,0 +1,43 @@
+﻿@using X.PagedList
+@using X.PagedList.Mvc.Core
+@model IPagedList<ProductProject.Data.Models.Product>
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Product List</h1>
+<br />
+<table class="table table-hover">
+    <tr>
+        <th class="hidden">ID</th>
+        <th>Product Name</th>
+        <th>Price</th>
+        <th>Stock</th>
+        <th>Category Name</th>
+        <th>Product Image</th>
+        <th>Update</th>
+        <th>Delete</th>
+        <th>Details</th>
+    </tr>
+    @foreach (var x in Model)
+    {
+        <tr>
+            <th class="hidden">@x.ProductID</th>
+            <td>@x.Name</td>
+            <td>@x.Price</td>
+            <td>@x.Stock</td>
+            <td>@x.Category.CategoryName</td>
+            <td><img src="~/Resimler/@x.ImageURL" alt="ProductStore" style="width:100px; height:80px;"/></td>
+            <td><a href="/Product/ProductUpdate/@x.ProductID" class="btn btn-success">Update</a></td>
+            <td><a href="/Product/ProductDelete/@x.ProductID" class="btn btn-danger">Delete</a></td>
+            <td><a href="/Product/ProductDetails/@x.ProductID" class="btn btn-info">Details</a></td>
+        </tr>
+    }
+
+</table>
+@Html.PagedListPager((IPagedList)Model,page=>Url.Action("Index",new{page})) @* sayfalama butonu için*@
+<a href="/Product/ProductAdd/" class="btn btn-primary">New Product</a>
+<br /><br /><br />
+
+

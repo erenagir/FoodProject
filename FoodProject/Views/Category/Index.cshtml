@@ -1,0 +1,48 @@
+﻿@*@using X.PagedList
+@using X.PagedList.Mvc.Core*@
+@model List<ProductProject.Data.Models.Category>
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<h1>Category List</h1>
+<br />
+@using (Html.BeginForm())
+{
+    <p>
+        Category Name: @Html.TextBox("p")
+        <input type="submit" value="Find" />
+    </p>
+}
+<table id="categoryTable" class="table table-hover">
+    <tr>
+        <th class="hidden">ID</th>
+        <th>Category Name</th>
+        <th>Status</th>
+        <th>Delete</th>
+        <th>Update</th>
+    </tr>
+    @foreach (var x in Model)
+    {
+        <tr>
+            <td class="hidden">@x.CategoryID</td>
+            <td>@x.CategoryName</td>
+            <td>@x.Status</td>
+            <td><a href="/Category/CategoryDelete/@x.CategoryID" class="btn btn-danger">Delete</a></td>
+            <td><a href="/Category/CategoryGet/@x.CategoryID" class="btn btn-success">Update</a></td>
+        </tr>
+    }
+    
+</table>
+@*@Html.PagedListPager((IPagedList)Model,page=>Url.Action("Index",new{page}))  *@
+<a style="margin-bottom:40px;" href="/Category/CategoryAdd/" class="btn btn-primary">New Category</a>
+@*<script>
+    const btnUpdate = document.querySelector('#deleteBtn');
+    function silConfirm()
+    {
+        let del = confirm("Silmek istediğinize emin misiniz?");
+        del ? alert("Silme işlemi başarılı") : "Silme işlemi iptal edildi";
+    }
+</script>*@

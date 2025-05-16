@@ -1,0 +1,27 @@
+﻿@using System.Globalization;
+@model List<ProductProject.Data.Models.OrderDetail>
+
+<table class="table table-hover">
+    <tr>
+        <th>Product Name</th>
+        <th class="text-center">Product Image</th>
+        <th>Product Price</th>
+        <th>Product Quantity</th>
+        <th>Product Order Date</th>
+        <th>Product Stock</th>
+
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.ProductName</td>
+            <td><img src="~/Resimler/@item.ProductImage" alt=" " class="text-center" style="width:150px; height:100px;"></td>
+            <td>@item.ProductPrice.ToString("C")</td>
+            <td>@item.ProductQuantity</td>
+            <td>@item.ProductOrderDate.ToLongDateString()</td>
+            <td>@item.ProductStock</td>
+
+        </tr>
+    }
+
+</table>

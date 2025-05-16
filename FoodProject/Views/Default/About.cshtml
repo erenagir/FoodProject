@@ -1,0 +1,27 @@
+﻿@model List<ProductProject.Data.Models.About>
+
+@{
+    ViewData["Title"] = "About";
+    Layout = "~/Views/Shared/_SiteLayout.cshtml";
+}
+
+@foreach (var item in Model)
+{
+    <div class="privacy about">
+        <h3>@item.AboutTitle</h3>
+        <p class="animi">
+        </p>
+        <div class="agile_about_grids">
+            <div class="col-md-6 agile_about_grid_right">
+                <img src="~/Resimler/@item.AboutImageURL" alt=" " class="img-responsive" />
+            </div>
+            <div class="col-md-6 agile_about_grid_left">
+                <p class="animi">
+                    @item.AboutText
+                </p>
+            </div>
+            <div class="clearfix"> </div>
+        </div>
+    </div>
+}
+

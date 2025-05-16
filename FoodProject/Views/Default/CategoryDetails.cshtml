@@ -1,0 +1,11 @@
+﻿@{
+    ViewData["Title"] = "CategoryDetails";
+    Layout = "~/Views/Shared/_SiteLayout.cshtml";
+}
+
+<div class="top-brands">
+    <div class="container">
+        <h3>Ürünlerimiz</h3>
+        @await Component.InvokeAsync("ProductListByCategory",new{id = @ViewBag.ID}) @* CategoryDetails action'ından gönderilen ID ProductListByCategory componentine taşınıyor*@
+    </div>
+</div>

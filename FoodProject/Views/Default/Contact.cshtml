@@ -1,0 +1,84 @@
+﻿@model ProductProject.Data.Models.Contact
+
+@{
+    ViewData["Title"] = "Contact";
+    Layout = "~/Views/Shared/_SiteLayout.cshtml";
+}
+
+<div class="mail" style="margin-bottom:75px;">
+    <h3>Bize Ulaşın</h3>
+    <div class="agileinfo_mail_grids">
+        <div class="col-md-4 agileinfo_mail_grid_left">
+            <ul>
+                <li><i class="fa fa-home" aria-hidden="true"></i></li>
+                <li>
+                    Adres<span>
+                        BOMONTİ / ŞİŞLİ – İSTANBUL
+                    </span>
+                </li>
+            </ul>
+            <ul>
+                <li><i class="fa fa-envelope" aria-hidden="true"></i></li>
+                <li>E-Mail<span><a href="mailto:Productstore@gmail.com">Productstore@gmail.com</a></span></li>
+            </ul>
+            <ul>
+                <li><i class="fa fa-phone" aria-hidden="true"></i></li>
+                <li>Bizi Arayın<span>(+0123) 234 567</span></li>
+            </ul>
+        </div>
+        <div class="col-md-8 agileinfo_mail_grid_right">
+            <form action="Contact" controller="Default" method="post">
+                <div class="col-md-6 wthree_contact_left_grid">
+                    <input type="text" name="ContactName" value="Adınız*" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Adınız*';}" required="">
+                    <input type="email" name="ContactEmail" value="E-Mail*" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'E-Mail*';}" required="">
+                </div>
+                <div class="col-md-6 wthree_contact_left_grid">
+                    <input type="text" name="ContactSurname" value="Soyadınız*" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Soyadınız*';}" required="">
+                    <input type="text" name="ContactSubject" value="Konu*" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Konu*';}" required="">
+                </div>
+                <div class="clearfix"> </div>
+                <textarea name="ContactMessage" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Mesajınız...';}" required="">Mesajınız...</textarea>
+                <input type="submit" value="Gönder" class="contact">
+                <input type="reset" value="Vazgeç">
+            </form>
+        </div>
+        <div class="clearfix"> </div>
+    </div>
+</div>
+<script>
+    //$(function () {
+    //$(".contact").click(function () {
+    //    alert("Mesajınız başarıyla gönderildi");
+    //    //swal({
+    //    //    title: "Harika!",
+    //    //    text: "Mesajınız başarıyla gönderildi.",
+    //    //    icon: "success",
+    //    //    button: "Tamam",
+    //    //});
+    //});
+    try {
+        $(".contact").click(function () {
+            $.ajax({
+                success: function (status, xhr) {
+                    swal({
+                        title: "Harika!",
+                        text: "Mesajınız başarıyla gönderildi.",
+                        icon: "success",
+                        button: "Tamam",
+                    });
+                },
+                error: function (xhr, status, error) {
+                    swal({
+                        title: "Üzgünüz!",
+                        text: "Mesajınız başarıyla gönderildi.",
+                        icon: "error",
+                        button: "Tamam",
+                    });
+                }
+            });
+        });
+    } catch (e) {
+        alert("You messed something up!");
+    }
+
+</script>
