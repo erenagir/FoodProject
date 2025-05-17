@@ -7,10 +7,15 @@ namespace ProductProject.ViewComponents
 {
 	public class CategoryGetList:ViewComponent
 	{
-		public IViewComponentResult Invoke()
+        private readonly Context _context;
+
+        public CategoryGetList(Context context)
+        {
+            _context = context;
+        }
+        public IViewComponentResult Invoke()
 		{
-			Context context= new Context();
-            var categoryList = context.Categories.Where(x => x.Status == true).ToList();
+            var categoryList = _context.Categories.Where(x => x.Status == true).ToList();
             return View(categoryList);
 		}
 	}

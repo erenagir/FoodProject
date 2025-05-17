@@ -4,8 +4,10 @@ using System.Linq;
 
 namespace ProductProject.Repositories
 {
-    public class ProductRepository:GenericRepository<Product> // T'yi karşılayan yapı Product olacak
+    public class ProductRepository : GenericRepository<Product> // T'yi karşılayan yapı Product olacak
     {
-
+        public ProductRepository(Context context) : base(context)
+        {
+        }
     }
 }

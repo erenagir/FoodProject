@@ -18,16 +18,21 @@ namespace ProductProject.Controllers
     [Authorize]
     public class OrderController : Controller
     {
-        Context context = new Context();
+        private readonly Context _context;
+
+        public OrderController(Context context)
+        {
+            _context = context;
+        }
         public IActionResult Index(int id)
         {
             ShoppingViewModel p = new ShoppingViewModel();
             if (User.Identity.IsAuthenticated) // sisteme otantike olmuşsa sepeti görüntüleyecek
             {
                 var userName = User.Identity.Name;
-                var userId = context.Users.Where(x => x.UserName == userName).Select(y => y.Id).FirstOrDefault();
+                var userId = _context.Users.Where(x => x.UserName == userName).Select(y => y.Id).FirstOrDefault();
 
-                var Product = context.Products.Find(id);
+                var Product = _context.Products.Find(id);
                 p.AppUserID = userId;
                 p.ProductID = Product.ProductID;
 
@@ -40,8 +45,8 @@ namespace ProductProject.Controllers
                     ShoppingPrice = p.ProductPrice,
                 };
 
-                context.Shoppings.Add(shopping);
-                context.SaveChanges();
+                _context.Shoppings.Add(shopping);
+                _context.SaveChanges();
                 return RedirectToAction("Index", "Default");
             }
             else
@@ -55,15 +60,15 @@ namespace ProductProject.Controllers
             Payment payment = new Payment();
 
             var userName = User.Identity.Name;
-            var userID = context.Users.Where(x => x.UserName == userName).Select(y => y.Id).FirstOrDefault();
-            var shopping = context.Shoppings.Where(x => x.AppUser.UserName == userName).Include(y => y.Product).ToList();
-            var ordersCount = context.OrderDetails.Where(x => x.AppUserID == userID).Count();
+            var userID = _context.Users.Where(x => x.UserName == userName).Select(y => y.Id).FirstOrDefault();
+            var shopping = _context.Shoppings.Where(x => x.AppUser.UserName == userName).Include(y => y.Product).ToList();
+            var ordersCount = _context.OrderDetails.Where(x => x.AppUserID == userID).Count();
             ViewBag.OrdersCount = ordersCount; // Verdiği sipariş sayısı
 
 
             if (User.Identity.IsAuthenticated) // sisteme otantike olmuşsa sepeti görüntüleyecek
             {
-                var basket = context.Shoppings.Where(x => x.AppUserID == userID).ToList();
+                var basket = _context.Shoppings.Where(x => x.AppUserID == userID).ToList();
 
                 ViewBag.TotalPrice = basket.Sum(x => x.ShoppingPrice * x.ShoppingQuantity);
 
@@ -85,24 +90,24 @@ namespace ProductProject.Controllers
         }
         public IActionResult DeleteProduct(int id)
         {
-            var deleteID = context.Shoppings.Find(id);
-            context.Shoppings.Remove(deleteID);
-            context.SaveChanges();
+            var deleteID = _context.Shoppings.Find(id);
+            _context.Shoppings.Remove(deleteID);
+            _context.SaveChanges();
             return RedirectToAction("BasketDetails", "Order");
         }
         public IActionResult PlusProduct(int id)
         {
-            var plusID = context.Shoppings.Find(id);
+            var plusID = _context.Shoppings.Find(id);
             plusID.ShoppingQuantity += 1;
-            context.SaveChanges();
+            _context.SaveChanges();
             return RedirectToAction("BasketDetails", "Order");
         }
 
         public IActionResult MinusProduct(int id)
         {
-            var minusID = context.Shoppings.Find(id);
+            var minusID = _context.Shoppings.Find(id);
             minusID.ShoppingQuantity -= 1;
-            context.SaveChanges();
+            _context.SaveChanges();
             return RedirectToAction("BasketDetails", "Order");
         }
         [HttpGet]
@@ -117,10 +122,10 @@ namespace ProductProject.Controllers
             if (!ModelState.IsValid)
             {
                 var userName = User.Identity.Name;
-                var userID = context.Users.Where(x => x.UserName == userName).Select(y => y.Id).FirstOrDefault();
-                var paymentID = context.Shoppings.Where(x => x.AppUser.Id == userID).Include(y => y.AppUser).Select(y => y.AppUserID).FirstOrDefault();
+                var userID = _context.Users.Where(x => x.UserName == userName).Select(y => y.Id).FirstOrDefault();
+                var paymentID = _context.Shoppings.Where(x => x.AppUser.Id == userID).Include(y => y.AppUser).Select(y => y.AppUserID).FirstOrDefault();
 
-                var basket = context.Shoppings.Where(x => x.AppUserID == userID).ToList(); // Giriş yapan kullanıcıya ait sepetteki ürünleri listeler
+                var basket = _context.Shoppings.Where(x => x.AppUserID == userID).ToList(); // Giriş yapan kullanıcıya ait sepetteki ürünleri listeler
                 foreach (var item in basket)
                 {
 
@@ -129,21 +134,21 @@ namespace ProductProject.Controllers
                         payment.AppUserID = paymentID;    // Giriş yapan kullanıcının id'si ile ödeme yapma işlemi
                         payment.ShoppingTotal = basket.Sum(x => x.ShoppingPrice * x.ShoppingQuantity); // ödenilen toplam fiyatı yansıttık
 
-                        context.Payments.Add(payment);
-                        context.SaveChanges();
+                        _context.Payments.Add(payment);
+                        _context.SaveChanges();
 
                         while (basket.Count() != 0)
                         {
                             // Ürün stock güncelleme işlemi
-                            var shoppingProductId = context.Shoppings.Where(x => x.AppUserID == userID).Select(y => y.ProductID).FirstOrDefault();
-                            var Products = context.Products.Find(shoppingProductId);
+                            var shoppingProductId = _context.Shoppings.Where(x => x.AppUserID == userID).Select(y => y.ProductID).FirstOrDefault();
+                            var Products = _context.Products.Find(shoppingProductId);
                             if (shoppingProductId == 0) // Sepette ürün kalmayınca döngünün kırılması için
                             {
                                 break;
                             }
                             Products.Stock -= item.ShoppingQuantity;
 
-                            var removeId = context.Shoppings.Where(x => x.AppUserID == userID).Select(y => y.ShoppingID).FirstOrDefault(); // giriş yapan kullanıcının id'si Shopping tablosunda varsa o kaydı seç
+                            var removeId = _context.Shoppings.Where(x => x.AppUserID == userID).Select(y => y.ShoppingID).FirstOrDefault(); // giriş yapan kullanıcının id'si Shopping tablosunda varsa o kaydı seç
                             if (removeId == 0)   // Sepette ürün kalmayınca döngünün kırılması için
                             {
                                 break;
@@ -159,14 +164,14 @@ namespace ProductProject.Controllers
                             orderDetail.AppUserID = item.AppUserID;
                             orderDetail.ProductQuantity = item.ShoppingQuantity;
                             orderDetail.ProductOrderDate = item.ShoppingDate;
-                            context.OrderDetails.Add(orderDetail);
-                            context.SaveChanges();
+                            _context.OrderDetails.Add(orderDetail);
+                            _context.SaveChanges();
 
                             // Sipariş verdikten sonra ürünleri sepetten kaldırma işlemi
 
-                            var id = context.Shoppings.Find(removeId); // seçilen kaydı Shopping tablosunda bul
-                            context.Shoppings.Remove(id); // ve bulunan kaydı sil
-                            context.SaveChanges();
+                            var id = _context.Shoppings.Find(removeId); // seçilen kaydı Shopping tablosunda bul
+                            _context.Shoppings.Remove(id); // ve bulunan kaydı sil
+                            _context.SaveChanges();
                         }
                     }
                 }
@@ -179,12 +184,12 @@ namespace ProductProject.Controllers
         public IActionResult UserOrders()
         {
             var userName = User.Identity.Name;
-            var userID = context.Users.Where(x => x.UserName == userName).Select(y => y.Id).FirstOrDefault();
-            var ordersCount = context.OrderDetails.Where(x => x.AppUserID == userID).Count();
+            var userID = _context.Users.Where(x => x.UserName == userName).Select(y => y.Id).FirstOrDefault();
+            var ordersCount = _context.OrderDetails.Where(x => x.AppUserID == userID).Count();
             ViewBag.OrdersCount = ordersCount; // Verdiği sipariş sayısı
             if (ordersCount != 0) // Sipariş sayısı 0'a eşit değilse bu siparişleri listele
             {
-                var userOrders = context.OrderDetails.Where(x => x.AppUserID == userID).ToList();
+                var userOrders = _context.OrderDetails.Where(x => x.AppUserID == userID).ToList();
                 return View(userOrders);
             }
             else

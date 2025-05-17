@@ -9,18 +9,24 @@ namespace ProductProject.Controllers
     [Authorize(Roles = "Admin")]
     public class NewsletterController : Controller
     {
-        Context context = new Context(); 
+        private readonly Context _context;
+
+        public NewsletterController(Context context)
+        {
+            _context = context;
+        }
 
         public IActionResult Index()
         {
-            var subscribeMails=context.Subscribes.ToList();
+            var subscribeMails = _context.Subscribes.ToList();
             return View(subscribeMails);
         }
+
         public IActionResult NewsletterDelete(int id)
         {
-            var subscribeID = context.Subscribes.Find(id);
-            context.Subscribes.Remove(subscribeID);
-            context.SaveChanges();
+            var subscribeID = _context.Subscribes.Find(id);
+            _context.Subscribes.Remove(subscribeID);
+            _context.SaveChanges();
             return RedirectToAction("Index");
         }
     }

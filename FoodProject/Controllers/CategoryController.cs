@@ -10,7 +10,12 @@ namespace ProductProject.Controllers
     [Authorize(Roles = "Admin")]
     public class CategoryController : Controller
     {
-        CategoryRepository categoryRepository = new CategoryRepository();
+        private readonly CategoryRepository categoryRepository;
+
+        public CategoryController(CategoryRepository categoryRepo)
+        {
+            categoryRepository = categoryRepo;
+        }
         public IActionResult Index(string p/*, int page = 1*/)
         {
             if (!string.IsNullOrEmpty(p))

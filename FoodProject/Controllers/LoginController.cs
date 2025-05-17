@@ -17,18 +17,21 @@ namespace ProductProject.Controllers
     public class LoginController : Controller
     {
         private readonly SignInManager<AppUser> _signInManager;
-        Context context = new Context();
-        public LoginController(SignInManager<AppUser> signInManager)
+        private readonly Context _context;
+
+        public LoginController(SignInManager<AppUser> signInManager, Context context)
         {
             _signInManager = signInManager;
+            _context = context;
         }
 
-        [AllowAnonymous] // Projedeki tüm controlleri yetkisiz giriş için engellediğimizden Login'de yer alan Index'i AllowAnonymous ile hariç bırakmış olduk.
+        [AllowAnonymous]
         [HttpGet]
         public IActionResult Index()
         {
             return View();
         }
+
         [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> Index(UserSignInViewModel p)
@@ -38,11 +41,26 @@ namespace ProductProject.Controllers
                 var result = await _signInManager.PasswordSignInAsync(p.username, p.password, false, true);
                 if (result.Succeeded)
                 {
-                    var name = context.Users.Where(x => x.UserName == p.username).Select(y => y.NameSurname).FirstOrDefault();
-                    var userId = context.Users.Where(x => x.UserName == name).Select(y => y.Id).FirstOrDefault();
+                    var name = _context.Users
+                        .Where(x => x.UserName == p.username)
+                        .Select(y => y.NameSurname)
+                        .FirstOrDefault();
 
-                    var userRoleId = context.UserRoles.Where(x => x.UserId == userId).Select(y => y.RoleId).FirstOrDefault();
-                    var roleName = context.Roles.Where(x => x.Id == userRoleId).Select(y => y.Name).FirstOrDefault();
+                    var userId = _context.Users
+                        .Where(x => x.UserName == p.username)
+                        .Select(y => y.Id)
+                        .FirstOrDefault();
+
+                    var userRoleId = _context.UserRoles
+                        .Where(x => x.UserId == userId)
+                        .Select(y => y.RoleId)
+                        .FirstOrDefault();
+
+                    var roleName = _context.Roles
+                        .Where(x => x.Id == userRoleId)
+                        .Select(y => y.Name)
+                        .FirstOrDefault();
+
                     if (roleName == "Admin")
                     {
                         return RedirectToAction("Statistics", "Chart");
@@ -57,33 +75,10 @@ namespace ProductProject.Controllers
                     return RedirectToAction("Index", "Login");
                 }
             }
+
             return RedirectToAction("Index", "Login");
-
-
         }
 
-        /* Kodların eski hali */
-        //      [AllowAnonymous]
-        //      [HttpPost]
-        //public async Task<IActionResult> Index(Admin admin)
-        //{
-        //          var dataValue = context.Admins.FirstOrDefault(x => x.UserName == admin.UserName && x.Password == admin.Password);
-        //          if (dataValue != null)
-        //          {
-        //              var claims = new List<Claim>
-        //              {
-        //                  new Claim(ClaimTypes.Name,admin.UserName)
-        //              };
-        //              var userIdentity=new ClaimsIdentity(claims,"Login");
-        //              ClaimsPrincipal principal = new ClaimsPrincipal(userIdentity);
-        //              await HttpContext.SignInAsync(principal);
-        //              return RedirectToAction("Index", "Category");
-        //          }
-        //          else
-        //          {
-        //		return View();
-        //	}			
-        //}
         public IActionResult AccessDenied()
         {
             return View();
@@ -92,11 +87,8 @@ namespace ProductProject.Controllers
         [HttpGet]
         public async Task<IActionResult> LogOut()
         {
-
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Category");
-
         }
-
     }
 }

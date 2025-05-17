@@ -12,7 +12,12 @@ namespace ProductProject.Controllers
     [Authorize(Roles = "Admin, Uye")]
     public class DefaultController : Controller
     {
-        Context context = new Context();
+        private readonly Context _context;
+
+        public DefaultController(Context context)
+        {
+            _context = context;
+        }
         public IActionResult Index()
         {
             return View();
@@ -30,8 +35,8 @@ namespace ProductProject.Controllers
         [HttpPost]
         public PartialViewResult Subscribe(Subscribe subscribe)
         {
-            context.Subscribes.Add(subscribe);
-            context.SaveChanges();
+            _context.Subscribes.Add(subscribe);
+            _context.SaveChanges();
             Response.Redirect("/Default/Index", true); // Abone olduktan sonra başka sayfaya gitmemesi için
             return PartialView();
         }
@@ -44,8 +49,8 @@ namespace ProductProject.Controllers
         [HttpPost]
         public IActionResult Contact(Contact contact)
         {
-            context.Contacts.Add(contact);
-            context.SaveChanges();
+            _context.Contacts.Add(contact);
+            _context.SaveChanges();
             return RedirectToAction("Index", "Default");
         }
         public PartialViewResult Footer()
@@ -54,12 +59,12 @@ namespace ProductProject.Controllers
         }
         public IActionResult About()
         {
-            var aboutList = context.Abouts.ToList();
+            var aboutList = _context.Abouts.ToList();
             return View(aboutList);
         }
         public IActionResult Products()
         {
-            var productList = context.Products.ToList();
+            var productList = _context.Products.ToList();
             return View(productList);
         }
         public PartialViewResult Slider()
@@ -73,12 +78,12 @@ namespace ProductProject.Controllers
 
             if (!string.IsNullOrEmpty(p))
             {
-                var about = context.Abouts.Where(x => x.AboutTitle!.Contains(p)).ToList();
-                var Product = context.Products.Where(x => x.Name!.Contains(p)).ToList();
+                var about = _context.Abouts.Where(x => x.AboutTitle!.Contains(p)).ToList();
+                var Product = _context.Products.Where(x => x.Name!.Contains(p)).ToList();
 
                 if (Product.Count != 0) // Eğer ürün adı yazılmışsa o ürünün id'sini ViewBag ile taşıyalım
                 {
-                    var ProductID = context.Products.Where(x => x.Name!.Contains(p)).FirstOrDefault();
+                    var ProductID = _context.Products.Where(x => x.Name!.Contains(p)).FirstOrDefault();
                     ViewBag.fID = ProductID.ProductID;
                 }
                 viewModel.Abouts = about;
@@ -90,7 +95,7 @@ namespace ProductProject.Controllers
         public IActionResult ProductDetails(int id)
         {
             var userName = User.Identity.Name;
-            var ProductID = context.Products.Find(id);
+            var ProductID = _context.Products.Find(id);
             return View(ProductID);
 
         }

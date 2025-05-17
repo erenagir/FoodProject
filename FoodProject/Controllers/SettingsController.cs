@@ -16,12 +16,15 @@ namespace ProductProject.Controllers
     [Authorize(Roles = "Admin")]
     public class SettingsController : Controller
     {
-        Context context = new Context();
+        private readonly Context _context;
+
         private readonly UserManager<AppUser> _userManager;
 
-        public SettingsController(UserManager<AppUser> userManager)
+        public SettingsController(UserManager<AppUser> userManager, Context context)
         {
             _userManager = userManager;
+            _context = context;
+
         }
 
         [HttpGet]
@@ -29,9 +32,9 @@ namespace ProductProject.Controllers
         {
             // var values = await _userManager.FindByNameAsync(User.Identity.Name);
             var userName = User.Identity.Name;
-            var userID=context.Users.Where(x=>x.UserName== userName).Select(y=>y.Id).FirstOrDefault();
-            var eMail= context.Users.Where(x => x.Id == userID).Select(y => y.Email).FirstOrDefault();
-            var nameSurname= context.Users.Where(x => x.Id == userID).Select(y => y.NameSurname).FirstOrDefault();
+            var userID= _context.Users.Where(x=>x.UserName== userName).Select(y=>y.Id).FirstOrDefault();
+            var eMail= _context.Users.Where(x => x.Id == userID).Select(y => y.Email).FirstOrDefault();
+            var nameSurname= _context.Users.Where(x => x.Id == userID).Select(y => y.NameSurname).FirstOrDefault();
 
             UserUpdateModel model = new UserUpdateModel();
             model.userid = userID;
@@ -44,7 +47,7 @@ namespace ProductProject.Controllers
         public async Task<IActionResult> Index(UserUpdateModel model)
         {
             var userName = User.Identity.Name;
-            var userID = context.Users.Where(x => x.UserName == userName).Select(y => y.Id).FirstOrDefault();
+            var userID = _context.Users.Where(x => x.UserName == userName).Select(y => y.Id).FirstOrDefault();
             model.userid=userID;
             if (ModelState.IsValid)
             {

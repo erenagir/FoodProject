@@ -1,7 +1,8 @@
-﻿using ProductProject.Data;
-using ProductProject.Data.Models;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using ProductProject.Data;
+using ProductProject.Data.Models;
 using System;
 using System.IO;
 using System.Linq;
@@ -12,16 +13,21 @@ namespace ProductProject.Controllers
     [Authorize(Roles = "Admin")]
     public class AboutController : Controller
     {
-        Context context = new Context();
+        private readonly Context _context;
+
+        public AboutController(Context context)
+        {
+            _context = context;
+        }
         public IActionResult Index()
         {
-            var about=context.Abouts.ToList();
+            var about= _context.Abouts.ToList();
             return View(about);
         }
         [HttpGet]
         public IActionResult AboutUpdate(int id)
         {
-            var aboutID = context.Abouts.Find(id);
+            var aboutID = _context.Abouts.Find(id);
             return View(aboutID);
         }
         [HttpPost]
@@ -40,8 +46,8 @@ namespace ProductProject.Controllers
             about.AboutID = p.AboutID;
             about.AboutTitle = p.AboutTitle;
             about.AboutText = p.AboutText;
-            context.Abouts.Update(about);
-            context.SaveChanges();
+            _context.Abouts.Update(about);
+            _context.SaveChanges();
             return RedirectToAction("Index", "About");
         }
     }

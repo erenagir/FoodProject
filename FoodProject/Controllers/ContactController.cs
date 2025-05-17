@@ -9,22 +9,27 @@ namespace ProductProject.Controllers
     [Authorize(Roles = "Admin")]
     public class ContactController : Controller
     {
-        Context context = new Context();
+        private readonly Context _context;
+
+        public ContactController(Context context)
+        {
+            _context = context;
+        }
         public IActionResult Index()
         {
-            var contact = context.Contacts.ToList();
+            var contact = _context.Contacts.ToList();
             return View(contact);
         }
         public IActionResult ContactDelete(int id)
         {
-            var contactID = context.Contacts.Find(id);
-            context.Contacts.Remove(contactID);
-            context.SaveChanges();
+            var contactID = _context.Contacts.Find(id);
+            _context.Contacts.Remove(contactID);
+            _context.SaveChanges();
             return RedirectToAction("Index");
         }
         public IActionResult ContactDetails(int id)
         {
-            var contactID = context.Contacts.Find(id);
+            var contactID = _context.Contacts.Find(id);
             return View(contactID);
         }
 

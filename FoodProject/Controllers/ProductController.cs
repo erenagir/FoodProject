@@ -18,16 +18,24 @@ namespace ProductProject.Controllers
     [Authorize(Roles = "Admin")]
     public class ProductController : Controller
     {
-        ProductRepository ProductRepository = new ProductRepository();
-        Context context = new Context();
+        private readonly ProductRepository productRepository;
+        private readonly Context _context;
+
+        public ProductController(Context context,ProductRepository productRepo)
+        {
+            _context = context;
+            productRepository = productRepo;
+
+        }
+
         public IActionResult Index(int page = 1)
         {
-            return View(ProductRepository.TList("Category").ToPagedList(page, 4)); // Sayfalama 1. sayfadan başlayıp her sayfada 4 veri olsun. // İlgili yiyeceğin kategori adını getirebilmek için
+            return View(productRepository.TList("Category").ToPagedList(page, 4)); // Sayfalama 1. sayfadan başlayıp her sayfada 4 veri olsun. // İlgili yiyeceğin kategori adını getirebilmek için
         }
         [HttpGet]
         public IActionResult ProductAdd()
         {
-            List<SelectListItem> values = (from x in context.Categories.Where(x=>x.Status==true).ToList()
+            List<SelectListItem> values = (from x in _context.Categories.Where(x=>x.Status==true).ToList()
                                            select new SelectListItem
                                            {
                                                Text = x.CategoryName,
@@ -54,12 +62,12 @@ namespace ProductProject.Controllers
             Product.Stock = p.Stock;
             Product.Description = p.Description;
             Product.CategoryID = p.CategoryID;
-            ProductRepository.TAdd(Product);
+            productRepository.TAdd(Product);
             return RedirectToAction("ProductAdd");
         }
         public IActionResult ProductDelete(int id)
         {
-            ProductRepository.TDelete(new Product { ProductID = id });
+            productRepository.TDelete(new Product { ProductID = id });
             return RedirectToAction("Index");
         }
         [HttpGet]
@@ -67,7 +75,7 @@ namespace ProductProject.Controllers
         {
             ProductImage ProductImage= new ProductImage();
             // Verileri dropdownlist'e taşıma
-            List<SelectListItem> values = (from y in context.Categories.Where(x => x.Status == true).ToList()
+            List<SelectListItem> values = (from y in _context.Categories.Where(x => x.Status == true).ToList()
                                            select new SelectListItem
                                            {
                                                Text = y.CategoryName,
@@ -77,7 +85,7 @@ namespace ProductProject.Controllers
 
 
 
-            var x = ProductRepository.TGet(id);
+            var x = productRepository.TGet(id);
             return View(x);
         }
         [HttpPost]
@@ -104,15 +112,15 @@ namespace ProductProject.Controllers
                 Product.Description = p.Description;
                 Product.ImageURL = p.ImageName;
                 Product.CategoryID = p.CategoryID;
-                ProductRepository.TUpdate(Product);
+                productRepository.TUpdate(Product);
             }
             return RedirectToAction("Index", "Product");
         }
         public IActionResult ProductDetails(int id)
         {
-            var ProductID = ProductRepository.TGet(id);
+            var ProductID = productRepository.TGet(id);
             var categoryID = ProductID.CategoryID;
-            var categoryName = context.Categories.Where(x => x.CategoryID == categoryID).Select(y => y.CategoryName).FirstOrDefault();
+            var categoryName = _context.Categories.Where(x => x.CategoryID == categoryID).Select(y => y.CategoryName).FirstOrDefault();
             ViewBag.categoryName = categoryName;
             return View(ProductID);
         }

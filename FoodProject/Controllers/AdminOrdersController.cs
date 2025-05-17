@@ -9,30 +9,35 @@ namespace ProductProject.Controllers
     [Authorize(Roles = "Admin")]
     public class AdminOrdersController : Controller
     {
-        Context context = new Context();
+        private readonly Context _context;
+
+        public AdminOrdersController(Context context)
+        {
+            _context = context;
+        }
         public IActionResult Index(int page = 1)
         {
-            var orders = context.Payments.ToList();
+            var orders = _context.Payments.ToList();
             return View(orders.ToPagedList(page, 8)); // Her sayfada 8 sipariş olsun
         }
         public IActionResult OrderDetails(int id) 
         {
-            var paymentID = context.Payments.Find(id);
+            var paymentID = _context.Payments.Find(id);
             ViewBag.ID = paymentID.AppUserID;
             return View(paymentID);
         }
         public IActionResult OrderCompleted(int id)
         {
-            var paymentID = context.Payments.Find(id);
-            context.Payments.Remove(paymentID);
-            context.SaveChanges();
+            var paymentID = _context.Payments.Find(id);
+            _context.Payments.Remove(paymentID);
+            _context.SaveChanges();
 
-            var orderDetailID=context.OrderDetails.Where(x => x.AppUserID == paymentID.AppUserID).Select(y=>y.OrderDetailID).ToList();
+            var orderDetailID=_context.OrderDetails.Where(x => x.AppUserID == paymentID.AppUserID).Select(y=>y.OrderDetailID).ToList();
             foreach(var item in orderDetailID)
             {
-                var orderIDFind=context.OrderDetails.Find(item);
-                context.OrderDetails.Remove(orderIDFind);
-                context.SaveChanges();
+                var orderIDFind=_context.OrderDetails.Find(item);
+                _context.OrderDetails.Remove(orderIDFind);
+                _context.SaveChanges();
             }
 
             return RedirectToAction("Index", "AdminOrders");

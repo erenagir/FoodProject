@@ -17,12 +17,15 @@ namespace ProductProject.Controllers
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<AppRole> _roleManager;
-        Context context = new Context();
+        private readonly Context _context;
 
-        public RegisterController(UserManager<AppUser> userManager, RoleManager<AppRole> roleManager)
+
+        public RegisterController(UserManager<AppUser> userManager, RoleManager<AppRole> roleManager, Context context)
         {
             _userManager = userManager;
             _roleManager = roleManager;
+            _context = context;
+
         }
 
         [HttpGet]
@@ -45,7 +48,7 @@ namespace ProductProject.Controllers
 
                 var result = await _userManager.CreateAsync(user, p.Password);
 
-                var roleName = context.Roles.Where(x => x.NormalizedName == "UYE").Select(y => y.Name).FirstOrDefault();
+                var roleName = _context.Roles.Where(x => x.NormalizedName == "UYE").Select(y => y.Name).FirstOrDefault();
 
                 if (result.Succeeded)
                 {
@@ -65,14 +68,5 @@ namespace ProductProject.Controllers
 
         }
 
-        //Eski kodlar
-
-        //[HttpPost]
-        //public IActionResult Index(Admin admin)
-        //{
-        //	context.Admins.Add(admin);
-        //	context.SaveChanges();
-        //	return RedirectToAction("Index", "Login");
-        //}
     }
 }
