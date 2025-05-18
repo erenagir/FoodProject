@@ -9,7 +9,7 @@ namespace ProductProject.Repositories
 {
     public class GenericRepository<T> where T: class, new() // T mutlaka bir class olmalı ve new sözcüğünü barındırabilmeli.
     {
-        private readonly Context _context;
+        public readonly Context _context;
 
         public GenericRepository(Context context)
         {

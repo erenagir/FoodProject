@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using ProductProject.Data.Models;
 using ProductProject.Repositories;
+using ProductProject.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +18,10 @@ builder.Services.AddDbContext<Context>(options =>
     options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
 });
 builder.Services.AddScoped<CategoryRepository>();
-builder.Services.AddScoped<ProductRepository>(); 
+builder.Services.AddScoped<ProductRepository>();
+var apiKey = builder.Configuration["OpenAI:ApiKey"];
+builder.Services.AddScoped<ProductSuggestService>();
+builder.Services.AddScoped<CategoryRepository>();
 
 
 

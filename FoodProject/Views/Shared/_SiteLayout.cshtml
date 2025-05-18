@@ -245,24 +245,52 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 
     <script>
         async function sendMessage() {
-            const input = document.getElementById("user-input");
-            const chat = document.getElementById("chat-content");
-            const message = input.value.trim();
-            if (!message) return;
+          const input = document.getElementById("user-input");
+          const chat = document.getElementById("chat-content");
+          const message = input.value.trim();
+          if (!message) return;
 
-            chat.innerHTML += `<div><strong>Sen:</strong> ${message}</div>`;
-            input.value = "";
+          chat.innerHTML += `<div><strong>Sen:</strong> ${message}</div>`;
+          input.value = "";
 
-            const response = await fetch("/SmartSuggest/AskAjax", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message })
+          try {
+            const response = await fetch("/api/smartsuggest/ask", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ message })
             });
 
-            const result = await response.text();
-            chat.innerHTML += `<div><strong>AI:</strong> ${result}</div>`;
+            if (!response.ok) {
+              const errText = await response.text();
+              chat.innerHTML += `<div><strong>Hata:</strong> Sunucu hatası (${response.status})</div>`;
+              return;
+            }
+
+            const raw = await response.json();
+
+            // 💥 Ana hareket bu satır:
+            const result = JSON.parse(raw.reply);
+
+            chat.innerHTML += `
+              <div class="mt-2">
+                <p><strong>AI:</strong> ${result.message}</p>
+                <div class="d-flex gap-2 mt-2">
+                  <a href="/Default/ProductDetails/${result.suggestedProduct}" class="btn btn-success btn-sm">🛒 Ürüne Git</a>
+                  <a href="/Default /CategoryDetails/${result.relatedCategoryId}" class="btn btn-outline-primary btn-sm">🔁 Benzer Ürünler</a>
+                </div>
+              </div>
+            `;
+
             chat.scrollTop = chat.scrollHeight;
+
+          } catch (error) {
+            console.error("❌ AJAX Hatası:", error);
+            chat.innerHTML += `<div><strong>Hata:</strong> API erişim problemi oluştu.</div>`;
+          }
         }
     </script>
+
+
+
 </body>
 </html>
